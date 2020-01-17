@@ -1,30 +1,27 @@
-import numpy as np
+from GMM import GMM
+from sklearn.datasets import make_blobs
+import matplotlib.pyplot as plt
 
-class KMeans():
-    def __init__(self):
-        self.k = None
-        self.means_ = None
-        self.cov_ = None
-        self.memberships_ = None
-    
-    def fit(self, X, k, tol_=1e-3):
-        self.k = k
-        self.initialize(X)
-        means_old = 0
-        while np.linalg.norm(self.means_ - means_old, axis = 1).mean() > tol_:
-            means_old = self.means_
-            self.update_memberships(X)
-            self.update_means(X)
-        self.update_covariances(X)
-        
-    def initialize(self, X):
-        self.means_ = X[np.random.permutation(len(X))[:self.k]]
-    
-    def update_memberships(self, X):
-        self.memberships_ = np.argmin(np.linalg.norm(X[:,None,:]-self.means_, axis=-1), axis=-1)
-    
-    def update_means(self, X):
-        self.means_ = np.array([X[self.memberships_==k].mean(axis=0) for k in range(self.k)])
-    
-    def update_covariances(self, X):
-        self.cov_ = np.array([np.cov(X[self.memberships_==k].T) for k in range(self.k)])
+X, y = make_blobs(n_samples=1000, centers=3, n_features=2)
+
+gmm_cls = GMM()
+gmm_cls.fit(X, 4)
+
+colors = []
+for l in gmm_cls.kmeans_cls_.memberships_:
+    if l == 0:
+        colors.append('red')
+    if l == 1:
+        colors.append('green')
+    if l == 2:
+        colors.append('orange')
+    if l == 3:
+        colors.append('blue')
+
+plt.scatter(X[:,0], X[:,1], c=colors, alpha=0.1)
+plt.scatter(gmm_cls.means_[:, 0], gmm_cls.means_[:, 1], c='k')
+plt.show()
+
+plt.scatter(X[:,0], X[:,1], c=colors, alpha=0.2)
+plt.scatter(gmm_cls.kmeans_cls_.means_[:, 0], gmm_cls.kmeans_cls_.means_[:, 1], c='k')
+plt.show()
