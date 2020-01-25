@@ -57,7 +57,7 @@ class GMM():
             exp_part = -0.5*np.einsum('ijk,jkl,ijl->ij', input_-self.means_, np.array(list(map(np.linalg.inv, self.cov_))), input_-self.means_)
             output = (1/((2*np.pi)**(d/2)*np.array(list(map(lambda x: np.linalg.det(x)**(1/2), self.cov_)))))[None, :]*np.exp(exp_part)
         elif self.cov_type_ in ['diag', 'spherical']:
-            exp_part = -0.5*np.einsum('ijk,jk->ij', (input_-self.means_[None, :, :])**2, self.cov_)
+            exp_part = -0.5*np.einsum('ijk,jk->ij', (input_-self.means_[None, :, :])**2, 1/self.cov_)
             output = (1/((2*np.pi)**(d/2)*np.prod(self.cov_, axis=1)**(1/2)))[None, :]*np.exp(exp_part)
             
         if normalized:
